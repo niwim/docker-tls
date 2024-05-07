@@ -1,4 +1,17 @@
+import path from "path";
+import https from "https";
+import fs from "fs";
 import express from "express";
+
+// Resolve paths to certificate and key files
+const keyPath = path.resolve(__dirname, "../cert/server/key.pem");
+const certPath = path.resolve(__dirname, "../cert/server/cert.pem");
+
+// Read certificate and key files
+const options = {
+  key: fs.readFileSync(keyPath),
+  cert: fs.readFileSync(certPath),
+};
 
 // Initialize the Express application
 const app = express();
@@ -8,10 +21,9 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// Get the port from the environment variables or use 3000 as a default
-const port = process.env.PORT || 3000;
+// Get the port from the environment variables or use 443 as a default
+const port = process.env.PORT || 443;
 
-// Start the server on the specified port
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+https.createServer(options, app).listen(port, () => {
+  console.log(`Server is running on https://localhost:${port}`);
 });
